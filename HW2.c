@@ -71,7 +71,11 @@ int main() {
         prompt();
         char cmd[MAX_LEN];
         fgets(cmd, sizeof(cmd), stdin);
-        determineWork(cmd);
+        if(strncmp(cmd, "exit", 4)==0){
+            break;
+        } else {
+            determineWork(cmd);
+        }      
     }
 
     return 0;
