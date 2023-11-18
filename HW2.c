@@ -13,12 +13,18 @@
 void dealDefultAddr(char *cwd, char *username){
 
     char DefultAddr[MAX_LEN] = "/home/";
+    char ptr[MAX_LEN];
     strcat(DefultAddr, username);
+    int DefultAddr_len = strlen(DefultAddr);
+    int cwd_len = strlen(cwd);
     
-    if(strcmp(DefultAddr, cwd) == 0){
+    if(strncmp(DefultAddr, cwd, DefultAddr_len) == 0){
+        memcpy(ptr,cwd+DefultAddr_len,cwd_len-DefultAddr_len);
         strcpy(cwd, "~");
+        strcat(cwd, ptr);
     }
-
+    
+    // strcpy(ptr, "");
     return;
 }
 
