@@ -8,7 +8,7 @@
 
 
 void isDefultAddr(char *cwd, char *username){
-    
+
     char DefultAddr[MAX_LEN] = "/home/";
     strcat(DefultAddr, username);
     int n = strcmp(DefultAddr, cwd);
@@ -31,14 +31,18 @@ void prompt(){
     getcwd(cwd, sizeof(cwd));
 
     isDefultAddr(cwd, username);
-    printf("%s@%s:%s$\n", username, hostname, cwd);
+    printf("%s@%s:%s$", username, hostname, cwd);
 
     return;
 }
 
 int main() {
     
-    prompt();
+    while(1){
+        prompt();
+        char cmd[MAX_LEN];
+        fgets(cmd, sizeof(cmd), stdin);
+    }
 
     return 0;
 }
