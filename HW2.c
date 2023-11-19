@@ -48,13 +48,13 @@ void prompt(){
 }
 
 void getAbsolutePath(char *cmd_arg){
-    
-    char cwd[MAX_LEN] = "";
-    getcwd(cwd, sizeof(cwd));
-    strcat(cwd, "/");
-    strcat(cwd, cmd_arg);
-    strcpy(cmd_arg, cwd);
-
+    if(strncmp(cmd_arg, "/", 1)!=0){
+        char cwd[MAX_LEN] = "";
+        getcwd(cwd, sizeof(cwd));
+        strcat(cwd, "/");
+        strcat(cwd, cmd_arg);
+        strcpy(cmd_arg, cwd);
+    }
     return;
 }
 
@@ -69,6 +69,40 @@ void getVar( char *cmd_arg){
             strcpy(var, getenv(cmd_arg));
         }
         strcpy(cmd_arg, var);
+    }
+    return;
+}
+
+void changeUnixVar(char *cmd_arg){
+    char temp[MAX_LEN]="";
+    char *var;
+    char var_name[MAX_LEN]="";
+    char var_value[MAX_LEN]="";
+    char add_value[MAX_LEN]="";
+
+    if( cmd_arg != NULL){
+        strcpy(temp, cmd_arg);
+    }
+    var = strtok(temp, "=");
+    if( var != NULL){
+        strcpy(var_name, var);
+    }
+    var = strtok(NULL, ":");
+    if( var != NULL){
+        strcpy(var_value, var);
+    }
+    var = strtok(NULL, "\0");
+    if( var != NULL){
+        strcpy(add_value, var);
+    }
+
+    if(var_name != NULL && strchr(cmd_arg, '=') != NULL){
+        getVar(var_value);
+        if(add_value != NULL){
+            strcat(var_value, ":");
+            strcat(var_value, add_value);
+        }
+        setenv(var_name, var_value, 1);
     }
     return;
 }
@@ -94,25 +128,19 @@ int main() {
             printf("%s\n", cwd);
         } else if(strcmp(cmd, "cd")==0) {
             scanf("%s",cmd_arg);
-            if(strncmp(cmd_arg, "/", 1)!=0){
-                getAbsolutePath(cmd_arg);
-            }
+            getAbsolutePath(cmd_arg);
             if (chdir(cmd_arg) != 0) {
                 printf("cd: %s: No such file or directory\n", cmd_arg);
             }
         } else if(strcmp(cmd, "export")==0){
             scanf("%s",cmd_arg);
-            // changeUnixVar(cmd_arg);
+            changeUnixVar(cmd_arg);
         } else if(strcmp(cmd, "echo")==0){
             scanf("%s",cmd_arg);
-
-            //判斷是否為 Unix Variables
-            if(strncmp(cmd_arg,"$",1) ==0){
-                getVar(cmd_arg);
-            }
+            getVar(cmd_arg);
             printf("%s\n",cmd_arg);
         } else {
-            printf("%s is not supported\n", cmd);
+            printf("%s: not supported\n", cmd);
         }
     }
 
