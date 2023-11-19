@@ -6,16 +6,25 @@
 #include <string.h>
 #include <ctype.h>
 
-#define DEBUG 0
 #define MAX_LEN 1024
 
+char *username;
+char hostname[MAX_LEN] = "";
+char DefultAddr[MAX_LEN] = "/home/";
+int DefultAddr_len;
 
-void dealDefultAddr(char *cwd, char *username){
-
-    char DefultAddr[MAX_LEN] = "/home/";
-    char ptr[MAX_LEN];
+void init(){
+    username = getenv("LOGNAME");
+    gethostname(hostname, sizeof(hostname));
     strcat(DefultAddr, username);
-    int DefultAddr_len = strlen(DefultAddr);
+    DefultAddr_len = strlen(DefultAddr);
+    return;
+}
+
+
+void dealDefultAddr(char *cwd){
+
+    char ptr[MAX_LEN] = "";     //不init的話，好像會記錄到其他東西
     int cwd_len = strlen(cwd);
     
     if(strncmp(DefultAddr, cwd, DefultAddr_len) == 0){
@@ -24,21 +33,15 @@ void dealDefultAddr(char *cwd, char *username){
         strcat(cwd, ptr);
     }
     
-    strcpy(ptr, "");    //釋放空間
     return;
 }
 
 void prompt(){
     
-    char *username;
-    char hostname[MAX_LEN];
-    char cwd[MAX_LEN];
-    
-    username = getenv("LOGNAME");
-    gethostname(hostname, sizeof(hostname));
+    char cwd[MAX_LEN] = "";
     getcwd(cwd, sizeof(cwd));
 
-    dealDefultAddr(cwd, username);
+    dealDefultAddr(cwd);
     printf("%s@%s:%s$ ", username, hostname, cwd);
 
     return;
@@ -46,7 +49,7 @@ void prompt(){
 
 void getAbsolutePath(char *cmd_arg){
     
-    char cwd[MAX_LEN];
+    char cwd[MAX_LEN] = "";
     getcwd(cwd, sizeof(cwd));
     strcat(cwd, "/");
     strcat(cwd, cmd_arg);
@@ -56,9 +59,11 @@ void getAbsolutePath(char *cmd_arg){
 }
 
 int main() {
+
+    init();
     
-    char cmd[MAX_LEN];
-    char cmd_arg[MAX_LEN];
+    char cmd[MAX_LEN] = "";
+    char cmd_arg[MAX_LEN] = "";
     while(1){
 
         prompt();
@@ -68,7 +73,7 @@ int main() {
             break;
         } else if(strcmp(cmd, "pwd")==0){
 
-            char cwd[MAX_LEN];
+            char cwd[MAX_LEN] = "";
             getcwd(cwd, sizeof(cwd));
             printf("%s\n", cwd);
 
@@ -85,12 +90,11 @@ int main() {
         } else if(strcmp(cmd, "export")==0){
 
         } else if(strcmp(cmd, "echo")==0){
-
+            scanf("%s",cmd_arg);
+            printf("%s\n",cmd_arg);
         } else {
             printf("%s is not supported\n", cmd);
         }
-        strcpy(cmd,"");
-        strcpy(cmd_arg,"");
     }
 
     return 0;
