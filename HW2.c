@@ -58,27 +58,33 @@ void getAbsolutePath(char *cmd_arg){
     return;
 }
 
+void getVar( char *cmd_arg){
+    char var[MAX_LEN];
+    strcpy(var, cmd_arg+1);
+    printf("%s\n",getenv(var));
+    return;
+}
+
 int main() {
 
     init();
     
-    char cmd[MAX_LEN] = "";
-    char cmd_arg[MAX_LEN] = "";
+    char cmd[MAX_LEN];
+    char cmd_arg[MAX_LEN];
     while(1){
-
+        strcpy(cmd,"");
+        strcpy(cmd_arg,"");
+        
         prompt();
         scanf("%s",cmd);
 
         if(strcmp(cmd, "exit")==0){
             break;
         } else if(strcmp(cmd, "pwd")==0){
-
             char cwd[MAX_LEN] = "";
             getcwd(cwd, sizeof(cwd));
             printf("%s\n", cwd);
-
         } else if(strcmp(cmd, "cd")==0) {
-
             scanf("%s",cmd_arg);
             if(strncmp(cmd_arg, "/", 1)!=0){
                 getAbsolutePath(cmd_arg);
@@ -86,12 +92,17 @@ int main() {
             if (chdir(cmd_arg) != 0) {
                 printf("cd: %s: No such file or directory\n", cmd_arg);
             }
-
         } else if(strcmp(cmd, "export")==0){
 
         } else if(strcmp(cmd, "echo")==0){
             scanf("%s",cmd_arg);
-            printf("%s\n",cmd_arg);
+
+            //判斷是否為 Unix Variables
+            if(strncmp(cmd_arg,"$",1) ==0){
+                getVar(cmd_arg);
+            } else {
+                printf("%s\n",cmd_arg);
+            }
         } else {
             printf("%s is not supported\n", cmd);
         }
