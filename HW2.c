@@ -108,29 +108,17 @@ void changeUnixVar(char *cmd_arg){
     return;
 }
 
-void external_command(char *cmd){
+void external_command(char *cmd_ttl){
     if(fork()==0){
-        cmd[strcspn(cmd,"\n")]='\0';
-        char cmd_arg[MAX_LEN];
         char *args[MAX_LEN];
-        int i=1;
-        fgets(cmd_arg, MAX_LEN, stdin);
-        cmd_arg[strcspn(cmd_arg,"\n")]='\0';
-        args[0] = cmd;
-        args[1] = strtok(cmd_arg, " \n");
-        if(strcmp(args[0],"\n")==0){
-            args[0]='\0';
-        }
+        int i=0;
+        args[0] = strtok(cmd_ttl, " \n");
         while(args[i++]!=NULL && i<10 ){
             args[i]=strtok(NULL, " ");
-            if(strcmp(args[i],"\n")==0){
-                args[i]=NULL;
-            }
         }
-        execvp(cmd, args);
+
+        execvp(args[0], args);
     } else {
-        char temp[MAX_LEN];
-        fgets(temp, MAX_LEN, stdin);
         wait(NULL); 
     }
     return;
@@ -140,14 +128,32 @@ int main() {
 
     init();
     
+    char cmd_ttl[MAX_LEN];
     char cmd[MAX_LEN];
     char cmd_arg[MAX_LEN];
+    char temp[MAX_LEN];
+    char *token;
     while(1){
+        strcpy(cmd_ttl,"");
         strcpy(cmd,"");
         strcpy(cmd_arg,"");
+        strcpy(temp,"");
         
         prompt();
-        scanf("%s",cmd);
+        fgets(cmd_ttl, MAX_LEN, stdin);
+        cmd_ttl[strcspn(cmd_ttl, "\n")]='\0';
+        if(cmd_ttl!=NULL){
+            strcpy(temp, cmd_ttl);
+        }
+
+        token = strtok(temp, " ");
+        if(token!=NULL){
+            strcpy(cmd, token);
+        }
+        token = strtok(NULL, "\0");
+        if(token!=NULL){
+            strcpy(cmd_arg, token);
+        }
 
         if(strcmp(cmd, "exit")==0){
             break;
@@ -156,20 +162,17 @@ int main() {
             getcwd(cwd, sizeof(cwd));
             printf("%s\n", cwd);
         } else if(strcmp(cmd, "cd")==0) {
-            scanf("%s",cmd_arg);
             getAbsolutePath(cmd_arg);
             if (chdir(cmd_arg) != 0) {
                 printf("cd: %s: No such file or directory\n", cmd_arg);
             }
         } else if(strcmp(cmd, "export")==0){
-            scanf("%s",cmd_arg);
             changeUnixVar(cmd_arg);
         } else if(strcmp(cmd, "echo")==0){
-            scanf("%s",cmd_arg);
             getVar(cmd_arg);
             printf("%s\n",cmd_arg);
         } else {
-            external_command(cmd);
+            external_command(cmd_ttl);
         }
     }
     return 0;
