@@ -24,7 +24,7 @@ void dealDefultAddr(char *cwd, char *username){
         strcat(cwd, ptr);
     }
     
-    // strcpy(ptr, "");
+    strcpy(ptr, "");    //釋放空間
     return;
 }
 
@@ -44,14 +44,24 @@ void prompt(){
     return;
 }
 
-void removeHeadSpace( char *cmd ){
+void getAbsolutePath(char *cmd_arg){
 
-    char *ptr = cmd;
-    while(isspace(*ptr)){
-        ptr++;
-    }
-    memmove(cmd,ptr,sizeof(ptr)+1);
+    #if GETABSOLUTEPATH
+        printf("enter getAbsolutePath");
+    #endif
 
+    char cwd[MAX_LEN];
+    getcwd(cwd, sizeof(cwd));
+    strcat(cwd, "/");
+    strcat(cwd, cmd_arg);
+    strcpy(cmd_arg, cwd);
+
+    #if GETABSOLUTEPATH
+    
+        printf("exit getAbsolutePath");
+    #endif
+
+    return;
 }
 
 int main() {
@@ -76,10 +86,11 @@ int main() {
         }else if(strncmp(cmd, "cd",2)==0) {
 
             scanf("%s",cmd_arg);
-            if(strncmp(cmd_arg, "/", 1)==0){
-                if (chdir(cmd_arg) != 0) {
-                    printf("cd: %s: No such file or directory\n", cmd);
-                    }
+            if(strncmp(cmd_arg, "/", 1)!=0){
+                getAbsolutePath(cmd_arg);
+            }
+            if (chdir(cmd_arg) != 0) {
+                printf("cd: %s: No such file or directory\n", cmd_arg);
             }
 
         } else if(strncmp(cmd, "export", 6)==0){
