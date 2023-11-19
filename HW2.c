@@ -73,17 +73,15 @@ int main() {
         prompt();
         scanf("%s",cmd);
 
-        if(strncmp(cmd, "exit", 4)==0){
-
+        if(strcmp(cmd, "exit")==0){
             break;
-
-        } else if(strncmp(cmd, "pwd", 3)==0){
+        } else if(strcmp(cmd, "pwd")==0){
 
             char cwd[MAX_LEN];
             getcwd(cwd, sizeof(cwd));
             printf("%s\n", cwd);
 
-        }else if(strncmp(cmd, "cd",2)==0) {
+        } else if(strcmp(cmd, "cd")==0) {
 
             scanf("%s",cmd_arg);
             if(strncmp(cmd_arg, "/", 1)!=0){
@@ -93,10 +91,12 @@ int main() {
                 printf("cd: %s: No such file or directory\n", cmd_arg);
             }
 
-        } else if(strncmp(cmd, "export", 6)==0){
+        } else if(strcmp(cmd, "export")==0){
 
-        } else if(strncmp(cmd, "echo", 4)==0){
+        } else if(strcmp(cmd, "echo")==0){
 
+        } else {
+            printf("%s is not supported\n", cmd);
         }
         strcpy(cmd,"");
         strcpy(cmd_arg,"");
