@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
+#include <sys/wait.h>
 
 #define MAX_LEN 1024
 
@@ -96,13 +97,41 @@ void changeUnixVar(char *cmd_arg){
         strcpy(add_value, var);
     }
 
-    if(var_name != NULL && strchr(cmd_arg, '=') != NULL){
+    if( strcmp(var_name, "")!=0 && strchr(cmd_arg, '=') != NULL){
         getVar(var_value);
-        if(add_value != NULL){
+        if(strchr(cmd_arg, ':') != NULL){
             strcat(var_value, ":");
             strcat(var_value, add_value);
         }
         setenv(var_name, var_value, 1);
+    }
+    return;
+}
+
+void external_command(char *cmd){
+    if(fork()==0){
+        cmd[strcspn(cmd,"\n")]='\0';
+        char cmd_arg[MAX_LEN];
+        char *args[MAX_LEN];
+        int i=1;
+        fgets(cmd_arg, MAX_LEN, stdin);
+        cmd_arg[strcspn(cmd_arg,"\n")]='\0';
+        args[0] = cmd;
+        args[1] = strtok(cmd_arg, " \n");
+        if(strcmp(args[0],"\n")==0){
+            args[0]='\0';
+        }
+        while(args[i++]!=NULL && i<10 ){
+            args[i]=strtok(NULL, " ");
+            if(strcmp(args[i],"\n")==0){
+                args[i]=NULL;
+            }
+        }
+        execvp(cmd, args);
+    } else {
+        char temp[MAX_LEN];
+        fgets(temp, MAX_LEN, stdin);
+        wait(NULL); 
     }
     return;
 }
@@ -140,9 +169,8 @@ int main() {
             getVar(cmd_arg);
             printf("%s\n",cmd_arg);
         } else {
-            printf("%s: not supported\n", cmd);
+            external_command(cmd);
         }
     }
-
     return 0;
 }
