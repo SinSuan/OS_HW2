@@ -39,27 +39,18 @@ void prompt(){
     getcwd(cwd, sizeof(cwd));
 
     dealDefultAddr(cwd, username);
-    printf("%s@%s:%s$", username, hostname, cwd);
+    printf("%s@%s:%s$ ", username, hostname, cwd);
 
     return;
 }
 
 void getAbsolutePath(char *cmd_arg){
-
-    #if GETABSOLUTEPATH
-        printf("enter getAbsolutePath");
-    #endif
-
+    
     char cwd[MAX_LEN];
     getcwd(cwd, sizeof(cwd));
     strcat(cwd, "/");
     strcat(cwd, cmd_arg);
     strcpy(cmd_arg, cwd);
-
-    #if GETABSOLUTEPATH
-    
-        printf("exit getAbsolutePath");
-    #endif
 
     return;
 }
