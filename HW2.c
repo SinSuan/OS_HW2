@@ -58,10 +58,18 @@ void getAbsolutePath(char *cmd_arg){
     return;
 }
 
-void getVar( char *var){
-    char temp[MAX_LEN];
-    strcpy(temp, var+1);
-    strcpy(var, temp);
+void getVar( char *cmd_arg){
+    if(cmd_arg != NULL && strncmp(cmd_arg, "$", 1)==0){
+        //把 "$" 去掉, 並取出該變數代表的值
+        char temp[MAX_LEN]="";
+        char var[MAX_LEN]="";
+        strcpy(temp, cmd_arg+1);
+        strcpy(cmd_arg, temp);
+        if(getenv(cmd_arg)!=NULL){
+            strcpy(var, getenv(cmd_arg));
+        }
+        strcpy(cmd_arg, var);
+    }
     return;
 }
 
@@ -100,10 +108,7 @@ int main() {
 
             //判斷是否為 Unix Variables
             if(strncmp(cmd_arg,"$",1) ==0){
-                char var[MAX_LEN];
-                strcpy(var, cmd_arg);
-                getVar(var);
-                strcpy(cmd_arg, getenv(var));
+                getVar(cmd_arg);
             }
             printf("%s\n",cmd_arg);
         } else {
